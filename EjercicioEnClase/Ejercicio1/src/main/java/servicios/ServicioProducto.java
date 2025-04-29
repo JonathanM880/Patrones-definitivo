@@ -6,7 +6,6 @@ import java.util.List;
 import crud.DbConfig;
 
 public interface ServicioProducto {
-	void setDbConfig(DbConfig dbConfig);
 
 	void create(Producto p);
 

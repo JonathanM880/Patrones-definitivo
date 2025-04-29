@@ -21,17 +21,11 @@ public class DbConfig {
     }
     public Connection getConnection() {
         try {
-            System.out.println("Conexión exitosa...");
             return ds.getConnection();
 
         }catch(SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-    
-    public static HikariConnectionProvider get()
-    {
-        return null;
     }
     
 }

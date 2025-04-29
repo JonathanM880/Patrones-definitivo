@@ -12,7 +12,6 @@ public class FactoryImpl implements Factory{
 	@Override
 	public void init(String pkgName) {
 		// TODO Auto-generated method stub
-		System.out.println("inicia");
 		try {
 			ClassPath classPath = ClassPath.from(FactoryImpl.class.getClassLoader());
 			var clases = classPath.getTopLevelClassesRecursive(pkgName);
@@ -20,7 +19,6 @@ public class FactoryImpl implements Factory{
 				var miComp = it.load().getAnnotation(MiComponente.class);
 				if(miComp != null) {
 					componentes.put(miComp.name(), it.load());
-					System.err.println(miComp.name());
 				}
 			}
 		}catch(Exception e) {

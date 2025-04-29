@@ -19,23 +19,16 @@ public class Tienda {
 		Map<String, Class> componentes = new HashMap<String, Class>();
 		Factory fac = new FactoryImpl();
 		fac.init("modelo");
-
-		Producto p1 = Producto.builder().cantidad(10).nombre("Coca-Cola").precio(1.25).build();
-		Producto p2 = Producto.builder().cantidad(12).nombre("GokuChiquito").precio(12.5).build();
-		Producto p3 = Producto.builder().cantidad(13).nombre("LibroMatematicaDiscreta").precio(15000000).build();
+		
+		servicio.create(Producto.builder().cantidad(10).nombre("Coca-Cola").precio(1.25).build());
+		servicio.create(Producto.builder().cantidad(12).nombre("GokuChiquito").precio(12.5).build());
+		servicio.create(Producto.builder().cantidad(13).nombre("LibroMatematicaDiscreta").precio(15000000).build());
 		Producto p4 = fac.create("comida");
-		p4.builder().cantidad(11).precio(10.3).nombre("Arroz");
+		servicio.create(p4.builder().cantidad(11).precio(10.3).nombre("Arroz").build());
 		Producto p5 = fac.create("bebida");
-		p5.builder().cantidad(35).precio(11.7).nombre("Vino Tinto");
+		servicio.create(p5.builder().cantidad(35).precio(11.7).nombre("Vino Tinto").build());
 		Producto p6 = fac.create("ropa");
-		p6.builder().cantidad(123).precio(23.85).nombre("Saco navideño");
-
-		servicio.create(p1);
-		servicio.create(p2);
-		servicio.create(p3);
-		servicio.create(p4);
-		servicio.create(p5);
-		servicio.create(p6);
+		servicio.create(p6.builder().cantidad(123).precio(23.85).nombre("Saco navideño").build());
 	}
 
 	public  void mostrarProductos() {
@@ -47,33 +40,38 @@ public class Tienda {
 		System.out.println("-----------------------------------------------------------------");
 	}
 
-	public  void comprarProducto(int id) {
-		ServicioImpl servicio = new ServicioImpl();
+	public static void comprarProducto(int id, int cantidad) {
+	    ServicioImpl s = new ServicioImpl();
 
-		Producto producto = servicio.read(id);
+	    Producto p = s.read(id);
 
-		if (producto != null && producto.getCantidad() > 0) {
-			producto.setCantidad(producto.getCantidad() - 1);
-			servicio.upgrade(producto);
-			System.out.println("Se realizó la compra :3 ");
-			System.out.println("-----------------------------------------------------------------");
-		} else {
-			System.out.println("Ya no quedan productos :v ");
-		}
+	    if (p != null) {
+	        if (p.getCantidad() >= cantidad) {
+	            p.setCantidad(p.getCantidad() - cantidad);
+	            s.upgrade(p);
+	            System.out.println("Compra realizada: " + cantidad + " unidades de " + p.getNombre()+ " :D");
+	            System.out.println("Gracias por la compra :3 ");
+	        } else {
+	            System.out.println("No hay suficiente stock disponible. Solo quedan " + p.getCantidad() + " unidades :´'( ");
+	        }
+	    } else {
+	        System.out.println("Producto no encontrado :o");
+	    }
 	}
 
+
 	public  Integer mostrarMenu() {
+		System.out.println();
 		System.out.println("--- BIENVENIDO A LA TIENDA ---");
 		System.out.println("Elija una de las siguientes opciones:");
 		System.out.println("1. Crear producto");
 		System.out.println("2. Leer producto por ID");
-		System.out.println("3. Listar productos");
+		System.out.println("3. Mostrar productos");
 		System.out.println("4. Actualizar producto");
 		System.out.println("5. Eliminar producto");
-		System.out.println("6. Mostrar todos los productos");
-		System.out.println("7. Comprar producto");
-		System.out.println("8. Salir");
-		System.out.print("Ingrese una opción(numérica): ");
+		System.out.println("6. Comprar producto");
+		System.out.println("7. Salir");
+		System.out.print("Ingrese una opción (numérica): ");
 
 		Scanner sc = new Scanner(System.in);
 		int opcion = sc.nextInt();
@@ -89,25 +87,25 @@ public class Tienda {
 			Integer opcion = mostrarMenu();
 			switch (opcion) {
 			case 1:
-				System.out.println("Ingrese nombre del producto:");
+				System.out.println("Ingrese nombre del producto: ");
 				String nombre = sc.next();
-				System.out.println("Ingrese precio:");
+				System.out.println("Ingrese precio: ");
 				double precio = sc.nextDouble();
-				System.out.println("Ingrese cantidad:");
+				System.out.println("Ingrese cantidad: ");
 				int cantidad = sc.nextInt();
-				Producto nuevoProducto = Producto.builder().nombre(nombre).precio(precio).cantidad(cantidad).build();
-				servicio.create(nuevoProducto);
-				System.out.println("Producto creado exitosamente.");
+				Producto pNuevo = Producto.builder().nombre(nombre).precio(precio).cantidad(cantidad).build();
+				servicio.create(pNuevo);
+				System.out.println("Producto creado exitosamente :) ");
 				break;
 
 			case 2:
-				System.out.println("Ingrese ID del producto a buscar:");
+				System.out.println("Ingrese ID del producto a buscar: ");
 				int idBuscar = sc.nextInt();
-				Producto productoBuscado = servicio.read(idBuscar);
-				if (productoBuscado != null) {
-					System.out.println(productoBuscado);
+				Producto pBuscado = servicio.read(idBuscar);
+				if (pBuscado != null) {
+					System.out.println(pBuscado);
 				} else {
-					System.out.println("Producto no encontrado.");
+					System.out.println("Producto no encontrado :( ");
 				}
 				break;
 
@@ -118,15 +116,15 @@ public class Tienda {
 			case 4:
 				System.out.println("Ingrese ID del producto a actualizar:");
 				int idActualizar = sc.nextInt();
-				Producto productoActualizar = servicio.read(idActualizar);
-				if (productoActualizar != null) {
+				Producto pActualizado = servicio.read(idActualizar);
+				if (pActualizado != null) {
 					System.out.println("Ingrese nuevo nombre:");
-					productoActualizar.setNombre(sc.next());
+					pActualizado.setNombre(sc.next());
 					System.out.println("Ingrese nuevo precio:");
-					productoActualizar.setPrecio(sc.nextDouble());
+					pActualizado.setPrecio(sc.nextDouble());
 					System.out.println("Ingrese nueva cantidad:");
-					productoActualizar.setCantidad(sc.nextInt());
-					servicio.upgrade(productoActualizar);
+					pActualizado.setCantidad(sc.nextInt());
+					servicio.upgrade(pActualizado);
 				} else {
 					System.out.println("Producto no encontrado.");
 				}
@@ -134,27 +132,25 @@ public class Tienda {
 
 			case 5:
 				System.out.println("Ingrese ID del producto a eliminar:");
-				int idEliminar = sc.nextInt();
-				servicio.delete(idEliminar);
+				int pEliminar = sc.nextInt();
+				servicio.delete(pEliminar);
 				break;
 
 			case 6:
-				mostrarProductos();
-				break;
+			    System.out.println("Ingrese ID del producto que quiere comprar:");
+			    int idCompra = sc.nextInt();
+			    System.out.println("Ingrese la cantidad que desea comprar:");
+			    int cantidadCompra = sc.nextInt();
+			    comprarProducto(idCompra, cantidadCompra);
+			    break;
 
 			case 7:
-				System.out.println("Ingrese ID del producto que quiere comprar:");
-				int idCompra = sc.nextInt();
-				comprarProducto(idCompra);
-				break;
-
-			case 8:
 				salir = true;
-				System.out.println("Gracias por usar la tienda. ¡Hasta luego!");
+				System.out.println("Gracias por usar la tienda <3 <3 <3");
 				break;
 
 			default:
-				System.out.println("Opción no válida, intente nuevamente.");
+				System.out.println("Opción no válida, intente nuevamente D: ");
 			}
 		}
 	}
